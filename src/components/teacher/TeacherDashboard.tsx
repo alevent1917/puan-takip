@@ -16,6 +16,7 @@ import { ClassesSubjectsView } from './ClassesSubjectsView';
 import { StudentsView } from './StudentsView';
 import { ReportsView } from './ReportsView';
 import { SqlSetupView } from './SqlSetupView';
+import { TeacherProfileView } from './TeacherProfileView';
 import { useAuth } from '../../context/AuthContext';
 
 type TeacherTab =
@@ -40,6 +41,7 @@ export const TeacherDashboard: React.FC = () => {
     { id: 'students' as TeacherTab, label: 'Öğrenci Kayıtları', icon: Users },
     { id: 'reports' as TeacherTab, label: 'Puan Raporları', icon: FileSpreadsheet },
     { id: 'sql-setup' as TeacherTab, label: 'Supabase SQL Kurulumu', icon: Database },
+    { id: 'profile' as TeacherTab, label: 'Profil Bilgilerim', icon: UserCheck },
   ];
 
   return (
@@ -52,7 +54,9 @@ export const TeacherDashboard: React.FC = () => {
               Öğretmen Paneli
             </div>
             <div className="text-sm font-bold text-slate-900 mt-1">
-              {user ? `${user.first_name} ${user.last_name}` : 'Öğretmen'}
+              {user && !(user.first_name === 'Yeni' && user.last_name === 'Öğrenci')
+                ? `${user.first_name} ${user.last_name}`
+                : 'Öğretmen'}
             </div>
             <div className="text-[11px] text-slate-500">Yetkili Yönetici</div>
           </div>
@@ -107,6 +111,7 @@ export const TeacherDashboard: React.FC = () => {
           {activeTab === 'students' && <StudentsView />}
           {activeTab === 'reports' && <ReportsView />}
           {activeTab === 'sql-setup' && <SqlSetupView />}
+          {activeTab === 'profile' && <TeacherProfileView />}
         </main>
       </div>
     </div>

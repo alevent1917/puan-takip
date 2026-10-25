@@ -15,7 +15,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenDeployModal }) => {
-  const { user, role, signOut, switchDemoUser, isLiveSupabase, isDemoMode, setDemoMode } = useAuth();
+  const { user, email, role, signOut, switchDemoUser, isLiveSupabase, isDemoMode, setDemoMode } = useAuth();
   const isDevEnvironment = import.meta.env.DEV;
 
   return (
@@ -124,11 +124,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSettings, onOpenDeployModa
           {user ? (
             <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
               <div className="text-right hidden sm:block">
-                <div className="text-xs font-semibold text-slate-900 truncate max-w-[130px]">
-                  {user.first_name} {user.last_name}
+                <div className="text-xs font-semibold text-slate-900 truncate max-w-[140px]">
+                  {role === 'teacher' && (user.last_name === 'Öğrenci' || user.first_name === 'Yeni')
+                    ? (email ? email.split('@')[0] : 'Öğretmen')
+                    : `${user.first_name} ${user.last_name}`}
                 </div>
                 <div className="text-[11px] text-slate-500">
-                  {role === 'teacher' ? 'Yetkili Öğretmen' : `Öğrenci (${user.student_number || 'No yok'})`}
+                  {role === 'teacher' ? 'Öğretmen Hesabı' : `Öğrenci No: ${user.student_number || '-'}`}
                 </div>
               </div>
 
