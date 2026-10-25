@@ -76,7 +76,11 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
 
-# Güvenlik duvarı izinleri
+# Oracle Cloud iptables ve Güvenlik Duvarı İzinleri
+echo "🛡️ Güvenlik duvarı portları açılıyor (80 ve 3000)..."
+sudo iptables -I INPUT 1 -p tcp --dport 80 -j ACCEPT || true
+sudo iptables -I INPUT 1 -p tcp --dport 3000 -j ACCEPT || true
+
 if command -v ufw >/dev/null 2>&1; then
   sudo ufw allow 80/tcp || true
   sudo ufw allow 443/tcp || true

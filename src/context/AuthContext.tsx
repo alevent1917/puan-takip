@@ -211,9 +211,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (authData.user) {
           setEmail(authData.user.email || null);
-          // Profil veritabanı trigger'ı tarafından otomatik oluşturulur
+
+          // Profil tetikleyicisini yedeklemek için profili doğrudan da doğrula/ekle
+          try {
+            await supabase.from('profiles').upsert({
+              id: authData.user.id,
+              first_name: data.firstName,
+              last_name: data.lastName,
+              student_number: data.studentNumber || null,
+              role: 'student',
+            });
+          } catch (pErr) {
+            console.warn('Profil yedek kaydı:', pErr);
+          }
+
+          // Eğer otomatik oturum açıldıysa kullanıcıyı hemen ata
+          if (authData.session) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', authData.user.id)
+              .single();
+            if (profile) {
+              setUser(profile as Profile);
+            }
+          }
+
           setIsLoading(false);
-          return { success: true };
+          return {
+            success: true,
+            error: !authData.session
+              ? 'Kayıt başarılı! Eğer e-posta doğrulaması açıksa lütfen gelen kutunuzu kontrol ediniz veya Supabase Auth ayarlarından "Confirm email" seçeneğini kapatınız.'
+              : undefined,
+          };
         }
       } else {
         // Mock yeni öğrenci kaydı

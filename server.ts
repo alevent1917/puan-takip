@@ -25,8 +25,17 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// Statik frontend dosyalarını sunma (Production build: dist)
-const distPath = path.resolve(__dirname, 'dist');
+import fs from 'fs';
+
+// Statik frontend dosyalarını sunma (dist klasörünün yerini dinamik bulur)
+const rootDist = path.resolve(__dirname, 'dist');
+const currentDist = __dirname;
+const distPath = fs.existsSync(path.join(rootDist, 'index.html'))
+  ? rootDist
+  : fs.existsSync(path.join(currentDist, 'index.html'))
+  ? currentDist
+  : path.resolve(process.cwd(), 'dist');
+
 app.use(express.static(distPath));
 
 // SPA Yönlendirmesi (Single Page Application Fallback)

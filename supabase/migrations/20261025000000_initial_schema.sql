@@ -168,6 +168,13 @@ CREATE POLICY "profiles_update_policy" ON public.profiles
     auth.uid() = id AND role = (SELECT p.role FROM public.profiles p WHERE p.id = auth.uid())
   );
 
+-- Yeni kaydolan kullanıcının öğrenci profilini ekleyebilmesine izin ver
+CREATE POLICY "profiles_insert_policy" ON public.profiles
+  FOR INSERT
+  WITH CHECK (
+    auth.uid() = id AND role = 'student'
+  );
+
 -- 2. CLASSES RLS
 -- Öğretmen sınıfları görebilir ve yönetebilir
 CREATE POLICY "classes_teacher_all" ON public.classes

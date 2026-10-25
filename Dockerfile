@@ -28,5 +28,5 @@ COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 
-# Run with tsx (or node dist/server.js if transpiled)
-CMD ["npx", "tsx", "server.ts"]
+# Native Node.js execution without runtime compiler overhead
+CMD ["node", "dist/server.js"]

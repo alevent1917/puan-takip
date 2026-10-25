@@ -312,6 +312,39 @@ WHERE id IN (
   SELECT id FROM auth.users WHERE email = 'ogretmen@okul.k12.tr'
 );`;
 
+  const SEED_SQL = `-- 1. Örnek Sınıfları Oluştur (10/A, 10/B, 11/A)
+INSERT INTO public.classes (id, name, school_year) VALUES
+  ('a1111111-1111-1111-1111-111111111111', '10/A', '2026-2027'),
+  ('a2222222-2222-2222-2222-222222222222', '10/B', '2026-2027'),
+  ('a3333333-3333-3333-3333-333333333333', '11/A', '2026-2027')
+ON CONFLICT (id) DO NOTHING;
+
+-- 2. En son kayıt olan kullanıcıyı öğretmen yap ve örnek dersleri bağla
+DO $$
+DECLARE
+  v_teacher_id UUID;
+BEGIN
+  SELECT id INTO v_teacher_id FROM auth.users ORDER BY created_at DESC LIMIT 1;
+
+  IF v_teacher_id IS NOT NULL THEN
+    INSERT INTO public.profiles (id, first_name, last_name, role)
+    VALUES (v_teacher_id, 'Öğretmen', 'Yönetici', 'teacher')
+    ON CONFLICT (id) DO UPDATE SET role = 'teacher';
+
+    INSERT INTO public.subjects (id, name, description, teacher_id) VALUES
+      ('b1111111-1111-1111-1111-111111111111', 'Yazılım Geliştirme', 'Algoritmalar ve Web Mimarisi', v_teacher_id),
+      ('b2222222-2222-2222-2222-222222222222', 'İleri Matematik', 'Fonksiyonlar ve Analitik Geometri', v_teacher_id),
+      ('b3333333-3333-3333-3333-333333333333', 'Fizik Lab', 'Kuvvet ve Enerji Uygulamaları', v_teacher_id)
+    ON CONFLICT (id) DO NOTHING;
+
+    INSERT INTO public.class_subjects (class_id, subject_id) VALUES
+      ('a1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111'),
+      ('a1111111-1111-1111-1111-111111111111', 'b2222222-2222-2222-2222-222222222222'),
+      ('a2222222-2222-2222-2222-222222222222', 'b1111111-1111-1111-1111-111111111111')
+    ON CONFLICT (class_id, subject_id) DO NOTHING;
+  END IF;
+END $$;`;
+
   return (
     <div className="space-y-6">
       {/* Başlık ve Genel Bilgi */}
@@ -400,6 +433,32 @@ WHERE id IN (
 
         <pre className="p-3 bg-slate-900 text-slate-100 rounded-lg text-xs font-mono overflow-x-auto">
 {PROMOTE_TEACHER_SQL}
+        </pre>
+      </div>
+
+      {/* Örnek Sınıflar ve Dersler (Seed Data) SQL'i */}
+      <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-bold text-slate-900 flex items-center gap-2">
+              <Database className="w-4 h-4 text-slate-700" />
+              <span>Örnek Sınıfları ve Dersleri Veritabanına Yükleme (Seed Data)</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Veritabanınız tamamen boşsa, 10/A, 10/B sınıflarını ve örnek dersleri tek seferde eklemek için bu kodu SQL Editor'de çalıştırın:
+            </p>
+          </div>
+          <button
+            onClick={() => copyToClipboard('seed', SEED_SQL)}
+            className="text-xs text-slate-700 hover:text-slate-900 flex items-center gap-1 font-medium"
+          >
+            {copiedKey === 'seed' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+            <span>Kodu Kopyala</span>
+          </button>
+        </div>
+
+        <pre className="p-3 bg-slate-900 text-slate-100 rounded-lg text-xs font-mono overflow-x-auto">
+{SEED_SQL}
         </pre>
       </div>
 
