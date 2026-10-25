@@ -1,0 +1,6 @@
+{
+  "name": "Öğrenci Haftalık Puan Takip Sistemi",
+  "description": "Öğretmenler için sınıf, ders ve hafta bazlı toplu puan girişi; öğrenciler için haftalık puan geçmişi, ders ortalamaları ve karne raporları.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
